@@ -19,6 +19,8 @@ pip install google-api-python-client
 pip install rfc3339
 ```
 
+## Usage
+
 You'll need to set an environment variable for the Youtube API Developer Key:
 ```bash
 export YT_DEV_KEY=yourdevkey
