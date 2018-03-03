@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Simple Map</title>
+  <meta name="viewport" content="initial-scale=1.0">
+  <meta charset="utf-8">
+  <style>
+    /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+
+    #map {
+      height: 100%;
+    }
+
+    /* Optional: Makes the sample page fill the window. */
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script>
+    function initMap() {
+      var map;
+      var bounds = new google.maps.LatLngBounds();
+      var mapOptions = {
+        mapTypeId: 'roadmap'
+      };
+
+      // Display a map on the page
+      map = new google.maps.Map(document.getElementById("map"), mapOptions);
+      map.setTilt(45);
+
+      // Multiple Markers
+      var markers = [
+        ['Tweet 1', 42.1292241, -80.085059],
+        ['Tweet 2', 38.8412819, -84.5981069],
+        ['Tweet 3', 46.4609815, -80.9877968],
+        ['Tweet 4', 42.3527987, -71.0958314],
+        ['Tweet 5', 54.5259614, -105.2551187],
+        ['Tweet 6', 54.5259614, -105.2551187],
+        ['Tweet 7', 37.5213728, -76.1050092],
+        ['Tweet 8', 46.5180824, -123.8264512]
+      ];
+
+      // Info Window Content
+      var infoWindowContent = [
+        ['<div class="info_content">' +
+          '<h3>Tweet 1</h3>' +
+          '<p>anaturalstate: RT DrFishSG: Algal bloom spreading into Lake Erie\'s central basin  http://www.sanduskyregister.com/news/environment/9425826Â â€¦ â€¦ http://ift.tt/1Jw8JjfÂ</p>' + '</div>'
+        ],
+        ['<div class="info_content">' +
+          '<h3>Tweet 2</h3>' +
+          '<p>Toxic algal bloom on Ohio River and Sunfish Creek (a tributary) continues to spread (Monroe County) http://ow.ly/RDm0yÂ</p>' +
+          '</div>'
+        ],
+        ['<div class="info_content">' +
+          '<h3>Tweet 3</h3>' +
+          '<p>Health unit: Possible algal bloom on Lake Nepahwin: The Sudbury and District Health Unit isâ€¦ http://goo.gl/lx5JLRÂ  pic.twitter.com/JlpTj7ndJj</p>' +
+          '</div>'
+        ],
+        ['<div class="info_content">' +
+          '<h3>Tweet 4</h3>' +
+          '<p>Algal bloom advisory has been modified: only includes the Charles River from Magazine Beach to the MOS Dam - http://camb.ma/1JJGQ4KÂ  #CambMA</p>' +
+          '</div>'
+        ],
+        ['<div class="info_content">' +
+          '<h3>Tweet 5</h3>' +
+          '<p>BH : Algal bloom / North-America / USA [0:0] | Details: http://ift.tt/1JCAck3Â</p>' +
+          '</div>'
+        ],
+        ['<div class="info_content">' +
+          '<h3>Tweet 6</h3>' +
+          '<p>#BH : Algal bloom / North-America / USA [0:0]: 09/03/2015 - 03:24:15 - Biologicalâ€¦ http://dlvr.it/C2nWCXÂ  vÃ­a @RSOE_EDIS #Health #salud</p>' +
+          '</div>'
+        ],
+        ['<div class="info_content">' +
+          '<h3>Tweet 7</h3>' +
+          '<p>TheFishSite: Chesapeake Bay Algal Bloom Among Most Intense in Years: US - Water sampling a... http://bit.ly/1Xj9PH2Â  #SustainableFishBIZ</p>' +
+          '</div>'
+        ],
+        ['<div class="info_content">' +
+          '<h3>Tweet 7</h3>' +
+          '<p>From the air, the Pacific algal bloom doesn\'t look like much of a threat: a wispy, brownish stream, snaking up... http://fb.me/25mLrxNpPÂ</p>' +
+          '</div>'
+        ]
+      ];
+
+      // Display multiple markers on a map
+      var infoWindow = new google.maps.InfoWindow(),
+        marker, i;
+
+      // Loop through our array of markers & place each one on the map
+      for (i = 0; i < markers.length; i++) {
+        var position = new google.maps.LatLng(markers[i][1], markers[i][2]);
+        bounds.extend(position);
+        marker = new google.maps.Marker({
+          position: position,
+          map: map,
+          title: markers[i][0],
+          icon: 'twitter.ico'
+        });
+
+        // Allow each marker to have an info window
+        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+          return function() {
+            infoWindow.setContent(infoWindowContent[i][0]);
+            infoWindow.open(map, marker);
+          }
+        })(marker, i));
+
+        // Automatically center the map fitting all markers on the screen
+        map.fitBounds(bounds);
+      }
+
+      // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
+      var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+        this.setZoom(14);
+        google.maps.event.removeListener(boundsListener);
+      });
+
+    }
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBunLHo_0eC2-DWs5ZDXgKcfPMkpd5pc7A&callback=initMap" async defer></script>
+</body>
+
+</html>

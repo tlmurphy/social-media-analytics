@@ -1,2 +1,7 @@
 venv/
 .twitter-config
+*.pyc
+api-key
+GoogleNews-vectors-negative300.bin
+evaluation_dataset
+training_dataset

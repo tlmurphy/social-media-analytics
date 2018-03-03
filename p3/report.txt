@@ -1,0 +1,2 @@
+True positives: 760	False positives: 2	True negatives: 124	False negatives: 102
+Precision: 0.997375328084	Recall: 0.881670533643	F1-score: 0.935960591133
