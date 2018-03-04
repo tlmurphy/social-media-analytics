@@ -72,16 +72,8 @@ def w2v_vector(dta, text):
     return [0.0 if v is None else str(v) for v in vector]
 
 
-def generate_report(metrics):
-    with open('report.txt', 'w') as f:
-        f.write('True positives: {}\tFalse positives: {}\tTrue negatives: {}\tFalse negatives: {}\n'.format(
-            metrics['tp'], metrics['fp'], metrics['tn'], metrics['fn']))
-        f.write('Precision: {}\tRecall: {}\tF1-score: {}\n'.format(
-            metrics['precision'], metrics['recall'], metrics['f1']))
-
-
-if __name__ == '__main__':
-    # Load tweets and model
+def load_data():
+    """Returns the trained tweets, evaluated tweets, and the w2v model"""
     t = time()
     print 'loading tweets, please wait...'
     trained_tweets = load_tweets('training_dataset')
@@ -91,10 +83,11 @@ if __name__ == '__main__':
     print 'loading w2v model, please wait...'
     model = w2v_load_model('GoogleNews-vectors-negative300.bin')
     print 'Time taken {}'.format(time() - t)
+    return trained_tweets, eval_tweets, model
 
-    # Build vectors and classify
-    dta = DeepTextAnalyzer(model)
-    clf = svm.SVC()
+
+def classify(dta, clf, trained_tweets):
+    """Build samples and features arrays and returns them"""
     X = []  # samples
     y = []  # features
     for tweet in trained_tweets:
@@ -102,9 +95,15 @@ if __name__ == '__main__':
         if vector is not None:  # ValueError: setting an array element with a sequence :')
             X.append(vector)
             y.append(tweet['label'])
-    clf.fit(X, y)
+    return X, y
 
-    # Predict
+
+def predict_and_analyze(dta, clf, eval_tweets):
+    """Predict our evaluated tweets then generate the metrics.
+    Metrics include True Positives (tp), False Positives (fp),
+    True Negatives (tn), False Negatives (fn), Precision, Recall,
+    and F1 score
+    Returns the metrics as a dictionary."""
     for tweet in eval_tweets:
         tweet['prediction'] = clf.predict([w2v_vector(dta, tweet['text'])])[0]
 
@@ -127,7 +126,35 @@ if __name__ == '__main__':
     metrics['recall'] = float(metrics['tp']) / (metrics['tp'] + metrics['fn'])
     metrics['f1'] = 2 * ((metrics['precision'] * metrics['recall']) /
                          (metrics['precision'] + metrics['recall']))
+    return metrics
 
-    generate_report(metrics)
 
-    print 'Check report.txt for results.'
+def generate_report(metrics, tweets):
+    with open('report.txt', 'w') as f:
+        f.write('True positives: {}\tFalse positives: {}\tTrue negatives: {}\tFalse negatives: {}\n'.format(
+            metrics['tp'], metrics['fp'], metrics['tn'], metrics['fn']))
+        f.write('Precision: {}\tRecall: {}\tF1-score: {}\n'.format(
+            metrics['precision'], metrics['recall'], metrics['f1']))
+        for t in tweets:
+            f.write('{}\t{}\n'.format(t['id_str'], t['label']))
+
+
+if __name__ == '__main__':
+    # Load tweets and model
+    trained_tweets, eval_tweets, model = load_data()
+
+    dta = DeepTextAnalyzer(model)
+    clf = svm.SVC()
+
+    # Get samples and features
+    X, y = classify(dta, clf, trained_tweets)
+
+    # Classify
+    clf.fit(X, y)
+
+    # Retrieve metrics from predictions
+    metrics = predict_and_analyze(dta, clf, eval_tweets)
+
+    generate_report(metrics, eval_tweets)
+
+    print 'Check report.txt for results'
