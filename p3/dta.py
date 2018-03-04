@@ -86,7 +86,7 @@ def load_data():
     return trained_tweets, eval_tweets, model
 
 
-def classify(dta, clf, trained_tweets):
+def build_sf(dta, clf, trained_tweets):
     """Build samples and features arrays and returns them"""
     X = []  # samples
     y = []  # features
@@ -147,7 +147,7 @@ if __name__ == '__main__':
     clf = svm.SVC()
 
     # Get samples and features
-    X, y = classify(dta, clf, trained_tweets)
+    X, y = build_sf(dta, clf, trained_tweets)
 
     # Classify
     clf.fit(X, y)
